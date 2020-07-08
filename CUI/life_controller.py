@@ -28,6 +28,7 @@ class controller:
             # 辞書のkeyはそのままlifeのid(識別子)となる
             for i in range(0, self.world_x, 1):
                 # c行 i列に座標(c,i)を初期値とするlifeをsummon 
+                # 将来的にmanual modeを実装したい(未対応)。今は"auto"で自動設定
                 field_of_lives_column[i] = life(c, i, "auto")
                 
             # 列のメンバー辞書を行の位置配列に保存する
