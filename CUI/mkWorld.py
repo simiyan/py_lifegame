@@ -1,5 +1,6 @@
 import os, time, sys
 from life_controller import controller
+
 def checkLivesStatus(target,generation):
     os.system('cls')
     print(str(generation) + "世代")
