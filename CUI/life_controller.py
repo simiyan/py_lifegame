@@ -49,6 +49,7 @@ class controller:
                 sum_status = self.hear_status(around_places, lives, life_place)
 
                 # 4.targetのlifeに周辺の合計を教える
+                # 将来的にstatusの変更理由も表示させたい(未対応)。そのための変数
                 change_result = objLives.change_status(sum_status)
                 
         return lives
