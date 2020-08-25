@@ -1,5 +1,7 @@
-import os
-from lives import life
+import os, sys
+from pathlib import Path
+sys.path.append(str(Path('__file__').resolve().parent.parent))
+from CUI.lives import life
 # (JP)livesをsummonし、observeし、next_generationに交代させる
 # (ENG)Summon lives, observe its status, and change next generation
 

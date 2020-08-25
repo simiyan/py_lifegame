@@ -1,10 +1,15 @@
 import sys, os, time, datetime, cv2
 import numpy as np
+from pathlib import Path
 from PyQt5.QtWidgets import QMessageBox, QApplication, QDialog, QWidget, QLineEdit, QLabel, QGraphicsView
 from PyQt5 import QtGui as gui, QtCore
+
+sys.path.append(str(Path('__file__').resolve().parent.parent))
+from CUI.life_controller import controller
+
 from pictbox import Ui_Dialog
 from QLabel_Clickable import QLabel_Clickable
-from life_controller import controller
+
 
 class world_ui(QDialog, QWidget):
     # resource名を指定

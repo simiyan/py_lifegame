@@ -1,4 +1,5 @@
 import os, time, sys
+from pathlib import Path
 from life_controller import controller
 from PyQt5.QtWidgets import QApplication
 from pictui_call import world_ui
@@ -14,7 +15,7 @@ def life_game(x, y):
         lives = lw.tell_around_status(lives)
         lives = lw.go2next_generation(lives)
         
-        time.sleep(0.8)
+        time.sleep(0.1)
 def life_gui(x, y):
     app = QApplication(sys.argv)
     window = world_ui(x, y)
