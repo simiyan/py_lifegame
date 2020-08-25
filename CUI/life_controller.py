@@ -1,3 +1,4 @@
+import os
 from lives import life
 # (JP)livesをsummonし、observeし、next_generationに交代させる
 # (ENG)Summon lives, observe its status, and change next generation
