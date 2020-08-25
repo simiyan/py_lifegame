@@ -105,3 +105,12 @@ class controller:
                 objLives.my_life_tick()
                 
         return lives
+
+    # livesのstatusをoutputする
+    def checkLivesStatus(self, target, generation):
+        os.system('cls')
+        print(str(generation) + "世代")
+        for i in range(len(target)):
+            for livesID, objLives in target[i].items():
+                print(objLives.tell_status(), end="")
+            print()
