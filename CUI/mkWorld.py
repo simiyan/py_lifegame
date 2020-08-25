@@ -1,6 +1,8 @@
 import os, time, sys
 from life_controller import controller
 
+
+
 def life_game(x, y):
     lw = controller(x, y)
     lives = lw.summon_lives()
@@ -13,7 +15,6 @@ def life_game(x, y):
         lives = lw.go2next_generation(lives)
         
         time.sleep(0.1)
-    
 if __name__=='__main__':
     life_game(10, 10)
     
