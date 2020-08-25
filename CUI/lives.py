@@ -2,7 +2,7 @@ import random
 class life:
     manual_mode = "manual"
     auto_mode = "auto"
-    def __init__(self, x, y, mode):
+    def __init__(self, x, y, mode, manual_status):
         # 自己の配列上の座標
         self.place = (x, y)
         
@@ -10,7 +10,7 @@ class life:
         # 手動：pass
         # 自動：擬似乱数で各life生成時に設定
         if self.manual_mode == mode:
-            pass
+            self.current_status = manual_status
             
         elif self.auto_mode == mode:
             self.current_status = random.randint(0, 1)

@@ -1,3 +1,4 @@
+import os
 from lives import life
 # (JP)livesをsummonし、observeし、next_generationに交代させる
 # (ENG)Summon lives, observe its status, and change next generation
@@ -16,26 +17,31 @@ class controller:
         self.field_of_lives_row = []
         
     # livesをsummonし、worldを返却
-    def summon_lives(self):
+    def summon_lives(self, mode, init_status:list = []):
+        if mode == "auto":
+            init_status_sub = [0] * self.world_x
+            for i in range(self.world_y):
+                init_status.append(init_status_sub)
+                
         # worldの行を示す配列に辞書を入れる。
         # cは南北方向にsummonする回数を表す。
         # また、lifeオブジェクトに初期の位置情報(y)を提供する。
-        for c in range(self.world_y):
+        for c in range(len(init_status)):
             # worldの東西を示す辞書(セルの列数)
             # 次の行にメンバーを追加する前にリセットする
             field_of_lives_column = {}
             # worldの列を示す辞書に、lifeオブジェクトを入れる
             # 辞書のkeyはそのままlifeのid(識別子)となる
-            for i in range(0, self.world_x, 1):
+            for i in range(len(init_status[c])):
                 # c行 i列に座標(c,i)を初期値とするlifeをsummon 
                 # 将来的にmanual modeを実装したい(未対応)。今は"auto"で自動設定
-                field_of_lives_column[i] = life(c, i, "auto")
+                field_of_lives_column[i] = life(c, i, mode, init_status[c][i])
                 
             # 列のメンバー辞書を行の位置配列に保存する
             self.field_of_lives_row.append(field_of_lives_column)
         return self.field_of_lives_row
-    
-    # 
+
+    # 各livesの周辺を調査し、次のstatusを教える
     def tell_around_status(self, lives):
         # worldを見回る
         for i in range(len(lives)):
@@ -56,7 +62,7 @@ class controller:
         return lives
     
     # 2.得られた位置情報から周辺座標を計算する                
-    def calc_around_places(self,myplace):
+    def calc_around_places(self, myplace):
         # 周辺調査用ループ数
         minus_one = -1
         zero = 0
@@ -90,7 +96,7 @@ class controller:
                     result += 0
         
         return result
-    
+
     # current_statusをnext_statusに書き換えさせる
     def go2next_generation(self, lives):
         # worldを見回って世代交代を指示
@@ -99,4 +105,23 @@ class controller:
                 objLives.my_life_tick()
                 
         return lives
-        
+
+    # livesのstatusをoutputする
+    def checkLivesStatus(self, target, generation):
+        os.system('cls')
+        print(str(generation) + "世代")
+        for i in range(len(target)):
+            for livesID, objLives in target[i].items():
+                print(objLives.tell_status(), end="")
+            print()
+
+    # livesのstatusを収集し、リストで返す
+    def collect_lives_status(self, lives):
+        result = []
+        for i in range(len(lives)):
+            lives_status_r = []
+            for livesID, objLives in lives[i].items():
+                lives_status_r.append(objLives.tell_status())
+            result.append(lives_status_r) 
+        return result
+    
