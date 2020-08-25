@@ -18,6 +18,11 @@ class controller:
         
     # livesをsummonし、worldを返却
     def summon_lives(self):
+        
+        
+        
+        
+        
         # worldの行を示す配列に辞書を入れる。
         # cは南北方向にsummonする回数を表す。
         # また、lifeオブジェクトに初期の位置情報(y)を提供する。
@@ -35,8 +40,8 @@ class controller:
             # 列のメンバー辞書を行の位置配列に保存する
             self.field_of_lives_row.append(field_of_lives_column)
         return self.field_of_lives_row
-    
-    # 
+
+    # 各livesの周辺を調査し、次のstatusを教える
     def tell_around_status(self, lives):
         # worldを見回る
         for i in range(len(lives)):
@@ -57,7 +62,7 @@ class controller:
         return lives
     
     # 2.得られた位置情報から周辺座標を計算する                
-    def calc_around_places(self,myplace):
+    def calc_around_places(self, myplace):
         # 周辺調査用ループ数
         minus_one = -1
         zero = 0
@@ -91,7 +96,7 @@ class controller:
                     result += 0
         
         return result
-    
+
     # current_statusをnext_statusに書き換えさせる
     def go2next_generation(self, lives):
         # worldを見回って世代交代を指示
@@ -100,4 +105,3 @@ class controller:
                 objLives.my_life_tick()
                 
         return lives
-        
