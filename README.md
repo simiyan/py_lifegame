@@ -16,17 +16,11 @@ Readmeは作成中。依存関係等を先に記載。
 
 ### 0.2 使い方
 
-- CUI-ver  
-mkWorld.pyを実行することで、デバッグコンソールでライフゲームが実行される。  
-worldサイズはmainでcallしているlife_game()の引数の調整で変更可能。  
-世代交代の間隔はlife_game()/time.sleep()の引数の調整で変更可能。  
-[いずれ設定値にしたい]
-
 - GUIver  
 pictui_call.pyを実行することで、ウィンドウが起動する。  
 最初はすべて「死」=「バツ」のstatusで起動する。  
 worldサイズはmainでcallしているlife_game()の引数の調整で変更可能。  
-世代交代の間隔はlife_game()/time.sleep()の引数の調整で変更可能。  
+世代交代の間隔はlife_game()/time.sleep()の引数の調整で変更可能。[いずれ設定値にしたい]  
 クリックで「生」と「死」を切り替えられる。　　
 「Random」ですべてのstatusをランダムに設定。  
 「Start」でlifegameをスタート。
