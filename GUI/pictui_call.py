@@ -20,13 +20,13 @@ class world_ui(QDialog, QWidget):
     static_video_sizex = 500
     static_video_sizey = 635
     
-    static_alive_pict = 'resources/maru12_5.jpg'
-    static_dead_pict = 'resources/batsu12_5.jpg'
-    static_pict_size = 12
+    # static_alive_pict = 'resources/maru12_5.jpg'
+    # static_dead_pict = 'resources/batsu12_5.jpg'
+    # static_pict_size = 12
     
-    # static_alive_pict = 'resources/maru25.png'
-    # static_dead_pict = 'resources/batsu25.png'
-    # static_pict_size = 25
+    static_alive_pict = 'resources/maru25.png'
+    static_dead_pict = 'resources/batsu25.png'
+    static_pict_size = 25
     
     # static_alive_pict = 'resources/maru150.jpg'
     # static_dead_pict = 'resources/batsu50.jpg'
@@ -303,6 +303,6 @@ class world_ui(QDialog, QWidget):
 # 単体call時の動作
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    window = world_ui(40, 40)
+    window = world_ui(20, 20)
     window.show()
     sys.exit(app.exec_())
