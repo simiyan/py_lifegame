@@ -8,11 +8,7 @@ Readmeは作成中。依存関係等を先に記載。
 
 ### 0.1 依存package
 
-下記のpakcageに依存。pipコマンドで記載。
-
-- pip install PyQt5
-- pip install opencv-python
-- pip install PyQt5Designer
+CUIverは依存packageなし
 
 ### 0.2 使い方
 
@@ -21,18 +17,6 @@ mkWorld.pyを実行することで、デバッグコンソールでライフゲ�
 worldサイズはmainでcallしているlife_game()の引数の調整で変更可能。  
 世代交代の間隔はlife_game()/time.sleep()の引数の調整で変更可能。  
 [いずれ設定値にしたい]
-
-- GUIver  
-pictui_call.pyを実行することで、ウィンドウが起動する。  
-最初はすべて「死」=「バツ」のstatusで起動する。  
-worldサイズはmainでcallしているlife_game()の引数の調整で変更可能。  
-世代交代の間隔はlife_game()/time.sleep()の引数の調整で変更可能。  
-クリックで「生」と「死」を切り替えられる。　　
-「Random」ですべてのstatusをランダムに設定。  
-「Start」でlifegameをスタート。
-「Stop/Pause」で世代交代を一時停止できる。  
-「Reset」すると、全てのstatusを「死」に変更して, その世界の変化をビデオ化する。  
-ビデオはmy_life_diaryフォルダに保存される。  
 
 ## 1.仕様 - CUIver
 
