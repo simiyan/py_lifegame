@@ -28,7 +28,7 @@ worldサイズはmainでcallしているlife_game()の引数の調整で変更�
 「Reset」すると、全てのstatusを「死」に変更して, その世界の変化をビデオ化する。  
 ビデオはmy_life_diaryフォルダに保存される。  
 
-## 1.仕様 - CUIver
+## 1.仕様 
 
 ### 1.1 基本ルール
 
