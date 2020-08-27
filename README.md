@@ -18,7 +18,7 @@ worldサイズはmainでcallしているlife_game()の引数の調整で変更�
 世代交代の間隔はlife_game()/time.sleep()の引数の調整で変更可能。  
 [いずれ設定値にしたい]
 
-## 1.仕様 - CUIver
+## 1.仕様 
 
 ### 1.1 基本ルール
 
