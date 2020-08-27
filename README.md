@@ -13,6 +13,7 @@ Readmeは作成中。依存関係等を先に記載。
 - pip install PyQt5
 - pip install opencv-python
 - pip install PyQt5Designer
+- pip install numpy
 
 ### 0.2 使い方
 
