@@ -2,6 +2,8 @@ import random
 class life:
     manual_mode = "manual"
     auto_mode = "auto"
+    
+    # modeと世界上の配置(座標)をset
     def __init__(self, x, y, mode):
         # 自己の配列上の座標
         self.place = (x, y)
@@ -18,13 +20,15 @@ class life:
         # 次のlifeのstatus
         self.next_status = 0
 
+    # 自己のステータス[生or死]を返却
     def tell_status(self):
         return self.current_status
     
+    # 自己の場所[座標]を返却
     def tell_place(self):
         return self.place
     
-    # aroud_sumの結果を受けてnext_statusを決める
+    # aroud_sum[周辺のstatus合計値]の結果を受けてnext_statusを決める
     def change_status(self, around_sum):
         result = 0
         reason = ""
@@ -42,6 +46,7 @@ class life:
         self.next_status = result
         return (result, reason)
     
+    # 世代を進める
     def my_life_tick(self):
         self.current_status = self.next_status
         
