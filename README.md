@@ -40,6 +40,7 @@ worldサイズはmainでcallしているlife_game()の引数の調整で変更�
 ### 2.1 lives
 
 - lifeは命であるので次の機能を持つ
+  - 初期statusは各lifeがrandomに決定する
   - 現在のstatus[生or死]を聞かれたら答える
   - 現在の場所[座標]を聞かれたら答える
   - 周辺のstatusの様子を聞き、次世代のstatusを決める
@@ -47,11 +48,15 @@ worldサイズはmainでcallしているlife_game()の引数の調整で変更�
 
 ### 2.2 life_controller
 
-- worldの監視者は次の機能を持つ  
+- worldの監視者[life_controller]は次の機能を持つ  
   - lifeの召喚
-  - lifeのstatus調査
+  - 各lifeのstatus調査
   - とあるlifeの周辺座標のlist up
-  - 周辺座標から合計値を計算
+  - list upされた周辺座標から合計値を計算
   - 各lifeに世代交代を指示
   - 各lifeからstatusを聞き出して表示
 - 実際にlifeオブジェクトを所持するのはこのクラス
+
+### 2.3 mkWorld
+
+- 
