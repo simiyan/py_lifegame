@@ -55,8 +55,5 @@ worldサイズはmainでcallしているlife_game()の引数の調整で変更�
   - list upされた周辺座標から合計値を計算
   - 各lifeに世代交代を指示
   - 各lifeからstatusを聞き出して表示
-- 実際にlifeオブジェクトを所持するのはこのクラス
 
 ### 2.3 mkWorld
-
-- 
