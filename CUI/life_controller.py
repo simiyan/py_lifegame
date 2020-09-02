@@ -41,7 +41,7 @@ class controller:
             self.field_of_lives_row.append(field_of_lives_column)
         return self.field_of_lives_row
 
-    # 各livesの周辺を調査し、次のstatusを教える
+    # 各livesの周辺を調査し、周辺の合計値を各lifeオブジェクトに伝える
     def tell_around_status(self, lives):
         # worldを見回る
         for i in range(len(lives)):

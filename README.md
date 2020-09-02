@@ -18,7 +18,7 @@ worldサイズはmainでcallしているlife_game()の引数の調整で変更�
 世代交代の間隔はlife_game()/time.sleep()の引数の調整で変更可能。  
 [いずれ設定値にしたい]
 
-## 1.仕様 
+## 1.仕様
 
 ### 1.1 基本ルール
 
@@ -31,10 +31,27 @@ worldサイズはmainでcallしているlife_game()の引数の調整で変更�
 ### 1.2 プログラム仕様
 
 - 登場人物(クラス)は以下の通り。
-  - 1.1のルールに従って動くlife
-  - lifeに世代交代等の指示を出す、worldの監視者
-  - lifeが存在するworld
+  - 1.1のルールに従って動くlife[lives]
+  - lifeに世代交代等の指示を出す、worldの監視者[life_controller]
+  - lifeが存在するworld[mkWorld]
 
 ## 2.仕様の詳細
 
 ### 2.1 lives
+
+- lifeは命であるので次の機能を持つ
+  - 現在のstatus[生or死]を聞かれたら答える
+  - 現在の場所[座標]を聞かれたら答える
+  - 周辺のstatusの様子を聞き、次世代のstatusを決める
+  - 次世代のstatusに進める
+
+### 2.2 life_controller
+
+- worldの監視者は次の機能を持つ  
+  - lifeの召喚
+  - lifeのstatus調査
+  - とあるlifeの周辺座標のlist up
+  - 周辺座標から合計値を計算
+  - 各lifeに世代交代を指示
+  - 各lifeからstatusを聞き出して表示
+- 実際にlifeオブジェクトを所持するのはこのクラス
