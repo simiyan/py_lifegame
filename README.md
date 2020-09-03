@@ -51,8 +51,8 @@ worldサイズはmainでcallしているlife_game()の引数の調整で変更�
 - worldの監視者[life_controller]は次の機能を持つ  
   - lifeの召喚
   - 各lifeのstatus調査
-  - とあるlifeの周辺座標のlist up
-  - list upされた周辺座標から合計値を計算
+    - とあるlifeの周辺座標のlist up
+    - list upされた周辺座標から合計値を計算
   - 各lifeに世代交代を指示
   - 各lifeからstatusを聞き出して表示
 
