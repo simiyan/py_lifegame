@@ -1,12 +1,23 @@
 import os, time, sys
 from life_controller import controller
 
+# 機能備忘録用関数
+def forSystemExplain(lives):
+    # life objectのlist(world全体)
+    print(type(lives))
+    # 1行目の辞書list
+    print(type(lives[0]))
+    # 1行目key'0'のlife object本体
+    print(type(lives[0][0]))
+    
 
-
-def life_game(x, y):
+def life_game(x: int, y: int):
     lw = controller(x, y)
     lives = lw.summon_lives()
     int_generation = 0
+    
+    # 機能備忘録用関数
+    # forSystemExplain(lives)
     
     while True:
         int_generation += 1
