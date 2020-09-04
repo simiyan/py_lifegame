@@ -57,3 +57,25 @@ worldサイズはmainでcallしているlife_game()の引数の調整で変更�
   - 各lifeからstatusを聞き出して表示
 
 ### 2.3 mkWorld
+
+### 99.その他
+
+- 2020/09/04 PEP8チェックツール、flake8を適用してみた
+  - 見つかった数：全ファイル中で53個
+    - 一番多かったもの
+      - W293 blank line contains whitespace(30個)
+      - 理由
+        - VScodeの自動indent機能のため。(改行すると勝手にindentしてくれる)
+    - 他
+      - E211 whitespace before '('
+      - E225 missing whitespace around operator
+      - E301 expected 1 blank line, found [0-9]
+      - E302 expected 2 blank lines, found [0-9]
+      - E303 too many blank lines (5)
+      - E305 expected 2 blank lines after class or function definition, found 0
+      - E401 multiple imports on one line
+      - F401 '*' imported but unused
+      - F841 local variable 'change_result' is assigned to but never used
+      - W291 trailing whitespace
+      - W292 no newline at end of file
+      - W391 blank line at end of file
