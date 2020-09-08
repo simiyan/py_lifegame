@@ -7,7 +7,7 @@ def life_game(x: int, y: int):
     lives = lc.summon_lives()
     int_generation = 0
 
-    # 機能備忘録用関数
+    # 機能の備忘録用関数
     # forSystemExplain(lives)
 
     while True:
@@ -19,7 +19,7 @@ def life_game(x: int, y: int):
         time.sleep(0.1)
 
 
-# 機能備忘録用関数
+# 機能の備忘録用関数
 def forSystemExplain(lives):
     # life objectのlist(world全体)
     print(type(lives))

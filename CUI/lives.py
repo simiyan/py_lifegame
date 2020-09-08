@@ -30,7 +30,7 @@ class life:
     def tell_place(self):
         return self.place
 
-    # aroud_sum[周辺のstatus合計値]の結果を受けてnext_statusを決める
+    # aroud_sum[周辺のstatus合計値]の結果を受けてnext_statusを決める。
     def change_status(self, around_sum):
         result = 0
         reason = ""
