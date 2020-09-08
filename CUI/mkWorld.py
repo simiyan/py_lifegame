@@ -1,7 +1,7 @@
 import time
 from life_controller import controller
 
-
+# start the lifegame
 def life_game(x: int, y: int):
     lc = controller(x, y)
     lives = lc.summon_lives()
