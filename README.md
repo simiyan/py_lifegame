@@ -39,7 +39,8 @@ worldサイズはmainでcallしているlife_game()の引数の調整で変更�
 
 ### 2.1 lives
 
-- lifeは命である。「どこにいる」と、  
+- lifeは命である。  
+- 「どこにいる」と、  
   「生きている/死んでいる」と、  
   「周りの生死により、次世代はどうする」がわかる。  
   よって次の機能を持つ。
@@ -61,6 +62,16 @@ worldサイズはmainでcallしているlife_game()の引数の調整で変更�
 
 ### 2.3 mkWorld
 
+- world[mkWorld]は世界である。
+- 「永続する」
+  「東西と南北に広がる」
+  「時間で移り変わる」特徴がある。
+  よって次の機能を持つ  
+  - 任意の方向x, yに世界を展開する
+  - 永続ループする
+  - 一定時間ごとに監視者にlifeのstatusを変化させる
+  - 実際に各オブジェクトを所持するのは、このクラス
+
 ### 99.その他
 
 - 2020/09/04 PEP8チェックツール、flake8を適用してみた
@@ -69,7 +80,7 @@ worldサイズはmainでcallしているlife_game()の引数の調整で変更�
       - W293 blank line contains whitespace(30個)
       - 理由
         - VScodeの自動indent機能のため。(改行すると勝手にindentしてくれる)
-    - 他
+    - 他 blank lineやwhitespaceが目立つ
       - E211 whitespace before '('
       - E225 missing whitespace around operator
       - E301 expected 1 blank line, found [0-9]
