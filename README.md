@@ -52,7 +52,7 @@ worldサイズはmainでcallしているlife_game()の引数の調整で変更�
 
 ### 2.2 life_controller
 
-- worldの監視者[life_controller]は次の機能を持つ  
+- worldの監視者[life_controller]は次の機能を持つ。  
   - lifeの召喚
   - 各lifeのstatus調査
     - とあるlifeの周辺座標のlist up
