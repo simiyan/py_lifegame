@@ -63,7 +63,7 @@ class controller:
 
         return lives
 
-    # 2.得られた位置情報から周辺座標を計算する
+    # 2.得られた位置情報から周辺座標を計算する。
     def calc_around_places(self, myplace):
         # 周辺調査用ループ数
         minus_one = -1
