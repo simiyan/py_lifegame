@@ -1,7 +1,6 @@
 import os
 from lives import life
-# (JP)livesをsummonし、observeし、next_generationに交代させる
-# (ENG)Summon lives, observe its status, and change next generation
+# livesをsummonし、observeし、next_generationに交代させる
 
 
 class controller:
@@ -111,7 +110,14 @@ class controller:
 
     # livesのstatusをoutputする
     def checkLivesStatus(self, target, generation):
-        os.system('cls')
+        OS_WIN = 'nt'
+        OS_UNIX = 'posix'
+        if os.name == OS_WIN:
+            os.system('cls')
+            
+        elif os.name == OS_UNIX:
+            os.system('clear')
+            
         print(str(generation) + "世代")
         for i in range(len(target)):
             for livesID, objLives in target[i].items():
