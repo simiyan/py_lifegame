@@ -22,7 +22,7 @@
 - VNCクライアントを入れる
   - UltraVNC → 接続できず
   - RealVNC → 有償のため使えない
-  - VNCクライアントはtigervncとする
+  - VNCクライアントはtigervncとする     
     - http://tigervnc.bphinz.com/nightly/
 - ディスプレイを使ってなかったからカメラの映像が映らない
   - xrdpをいれたけどwinsysのエラー
