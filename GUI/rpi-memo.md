@@ -1,0 +1,29 @@
+- sudo apt update && sudo apt full-upgrade && sudo apt install -y xrdp vim hailo-all tmux && sudo apt -y autoremove
+  - OSインストール時のおまじないと必要なソフトのインストール
+  - カメラを移すには画面(GUI)が必要
+  - Desktop版のOSを入れていたらRDPでGUIに接続できる
+  - hailo：AI Kitを動かすために必要なミドルウェア群
+- sudo raspi-config nonint do_vnc 0
+  - VNCサーバを有効化する
+- sudo rpi-eeprom-update
+  - eeprom(?)の最新確認
+  - 2023 年 12 月 6 日以降の日付であること
+  - でなければ↓
+- sudo raspi-config > Advanced Options > Bootloader Version > Latest
+  - これでupdate
+- sudo rpi-eeprom-update -a
+  - 必要ならupdateを実行
+- hailortcli fw-control identify
+  - hailoインストールの確認
+- git clone --depth 1 https://github.com/raspberrypi/rpicam-apps.git ./rpicam-apps
+  - デモアプリのclone
+- rpicam-hello -t 10s
+  - テスト動作実行
+- VNCクライアントを入れる
+  - UltraVNC → 接続できず
+  - RealVNC → 有償のため使えない
+  - VNCクライアントはtigervncとする
+    - http://tigervnc.bphinz.com/nightly/
+- ディスプレイを使ってなかったからカメラの映像が映らない
+  - xrdpをいれたけどwinsysのエラー
+  - RDPはWindowsの仕組みだからNGと推測

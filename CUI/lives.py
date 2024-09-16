@@ -1,8 +1,10 @@
 import random
+
+
 class life:
     manual_mode = "manual"
     auto_mode = "auto"
-    def __init__(self, x, y, mode, manual_status):
+    def __init__(self, x: int, y: int, mode: str, manual_status: int) -> None:
         # 自己の配列上の座標
         self.place = (x, y)
         
