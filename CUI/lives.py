@@ -1,7 +1,7 @@
 import random
 
 
-class life:
+class Life:
     manual_mode = "manual"
     auto_mode = "auto"
 
