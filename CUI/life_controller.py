@@ -1,29 +1,22 @@
 import os
-from lives import life
+from lives import Life
 # livesをsummonし、observeし、next_generationに交代させる
 
 
-class controller:
+class Controller:
     world_x = 0
     world_y = 0
 
     def __init__(self, maxX, maxY):
-        # (JP)世界の大きさ
-        # (ENG)Size of World
+        # 世界の大きさ
         self.world_x = maxX
         self.world_y = maxY
 
-        # (JP)worldの南北を示す配列
-        # (ENG)Array for North South
+        # worldの南北を示す配列
         self.field_of_lives_row = []
 
     # livesをsummonし、worldを返却
     def summon_lives(self):
-        #
-        #
-        #
-        #
-        #
         # worldの行を示す配列に辞書を入れる。
         # cは南北方向にsummonする回数を表す。
         # また、lifeオブジェクトに初期の位置情報(y)を提供する。
@@ -36,7 +29,7 @@ class controller:
             for i in range(0, self.world_x, 1):
                 # c行 i列に座標(c,i)を初期値とするlifeをsummon
                 # 将来的にmanual modeを実装したい(未対応)。今は"auto"で自動設定
-                field_of_lives_column[i] = life(c, i, "auto")
+                field_of_lives_column[i] = Life(c, i, "auto")
 
             # 列のメンバー辞書を行の位置配列に保存する
             self.field_of_lives_row.append(field_of_lives_column)
