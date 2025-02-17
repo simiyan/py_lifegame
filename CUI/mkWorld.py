@@ -1,22 +1,23 @@
 import time
-from life_controller import controller
+from life_controller import Controller
 
 # start the lifegame
 def life_game(x: int, y: int):
-    lc = controller(x, y)
+    lc = Controller(x, y)
     lives = lc.summon_lives()
     int_generation = 0
 
     # 機能の備忘録用関数
     # forSystemExplain(lives)
-
-    while True:
-        int_generation += 1
-        lc.checkLivesStatus(lives, int_generation)
-        lives = lc.tell_around_status(lives)
-        lives = lc.go2next_generation(lives)
-
-        time.sleep(0.1)
+    try:
+        while True:
+            int_generation += 1
+            lc.checkLivesStatus(lives, int_generation)
+            lives = lc.tell_around_status(lives)
+            lives = lc.go2next_generation(lives)
+            time.sleep(1)
+    except KeyboardInterrupt:
+        print("\nゲームを終了します。")
 
 
 # 機能の備忘録用関数
