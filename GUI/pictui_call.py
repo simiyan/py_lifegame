@@ -1,10 +1,15 @@
-import sys, os, time, datetime, cv2
+import sys
+import os
+import datetime
+import cv2
 import numpy as np
 from pathlib import Path
-from PySide6.QtWidgets import QMessageBox, QApplication, QDialog, QWidget, QLineEdit, QLabel, QGraphicsView
-from PyQt5 import QtGui as gui, QtCore
+from PySide6.QtWidgets import QApplication, QDialog, QWidget
+#  , QLineEdit, QLabel, QGraphicsView, QMessageBox
 
 sys.path.append(str(Path('__file__').resolve().parent.parent))
+
+from PySide6 import QtGui as gui, QtCore
 from CUI.life_controller import controller
 
 from pictbox import Ui_Dialog
@@ -81,9 +86,9 @@ class world_ui(QDialog, QWidget):
         # selectedindexを変える
         self.ui.cmbInitialData.setCurrentIndex(1)
         # selectedindexを取得する
-        ## print(self.ui.cmbInitialData.currentIndex())
+        #  print(self.ui.cmbInitialData.currentIndex())
         # 選択中のitemの値を取得する
-        ## print(self.ui.cmbInitialData.itemText(self.ui.cmbInitialData.currentIndex()))
+        # print(self.ui.cmbInitialData.itemText(self.ui.cmbInitialData.currentIndex()))
 
         # *** for pict save directory/will change to function ***
         if not os.path.exists(self.static_logdir_name):
@@ -93,17 +98,18 @@ class world_ui(QDialog, QWidget):
         os.mkdir(self.capturedir)
 
     def cmbChanged(self):
-        pass #print("changed")
+        pass
+        # print("changed")
 
-    def txtStatusUpdate(self, name, reason:tuple):
+    def txtStatusUpdate(self, name, reason: tuple):
         # ex:label1はmanualにより*になった
         # reasonはstatus, reasonをもつ
         status = ""
         if reason[0] == 0:
-            status  = "死"
+            status = "死"
 
-        elif reason [0] == 1:
-           status = "生"
+        elif reason[0] == 1:
+            status = "生"
 
         self.ui.txtLifeStatus.append(name + "は" + reason[1] + "により" + status + "になった。")
 
@@ -114,10 +120,10 @@ class world_ui(QDialog, QWidget):
             self.init_placex = 10
             for x in range(worldx):
                 labelName = self.static_label_name + str(x) + "_" + str(y)
-                
+
                 # labelをworldの回数定義し、nameとobjectを辞書で返却
                 result.update(self.mkLabel(self.init_placex, self.init_placey, labelName))
-                
+
                 self.static_label_name_list.append(labelName)
                 self.init_placex += self.static_pict_size
             self.init_placey += self.static_pict_size
@@ -137,12 +143,12 @@ class world_ui(QDialog, QWidget):
 
         imageLabel.setGeometry(QtCore.QRect(x, y, self.static_pict_size, self.static_pict_size))
         imageLabel.clicked.connect(lambda: self.lbl_clicked(imageLabel))
-        result = {imageLabel.tell_myname():imageLabel}
+        result = {imageLabel.tell_myname(): imageLabel}
         return result
 
     # labelの変更後status listを参照し、各labelのstatusを変更する
     # 仮引数ではアドレスが変わってしまうため、インスタンス変数を直接編集し、returnはしない
-    def labels_chg_status(self, status_list:list):
+    def labels_chg_status(self, status_list: list):
         for s in range(len(status_list)):
             for r in range(len(status_list[s])):
                 label_name = self.static_label_name + str(r) + "_" + str(s)
@@ -157,7 +163,7 @@ class world_ui(QDialog, QWidget):
                 self.dictLabel[label_name].setPixmap(gui.QPixmap.fromImage(img))
 
     # 与えられたstatusによって、画像とstatusを反転させる
-    def label_reverse_status(self, status, imglbl:QLabel_Clickable):
+    def label_reverse_status(self, status, imglbl: QLabel_Clickable):
         if status == 0:
             img = gui.QImage(self.static_alive_pict_path)
             imglbl.change_status(1)
@@ -169,7 +175,7 @@ class world_ui(QDialog, QWidget):
         imglbl.setPixmap(gui.QPixmap.fromImage(img))
 
     # ラベルクリック時にstatusによって画像を変更する
-    def lbl_clicked(self, imglbl:QLabel_Clickable):
+    def lbl_clicked(self, imglbl: QLabel_Clickable):
         status = imglbl.tell_status()
         self.label_reverse_status(status, imglbl)
 
@@ -187,10 +193,10 @@ class world_ui(QDialog, QWidget):
         return result2nd
 
     def btnStopPause_clicked(self):
-        if self.flgContinue == True:
+        if self.flgContinue is True:
             self.flgContinue = False
 
-        elif self.flgContinue == False:
+        elif self.flgContinue is False:
             self.flgContinue = True
 
     # make video from screenshot
@@ -205,7 +211,7 @@ class world_ui(QDialog, QWidget):
         now_generation = self.ui.lblGeneration.text()[:-1]
         now_generation = now_generation[:-1]
 
-        for i in range (1, int(now_generation) + 1):
+        for i in range(1, int(now_generation) + 1):
             QApplication.processEvents()
             pictpath = self.capturedir + "/" + '{0:03d}.jpg'.format(i)
             img = cv2.imread(pictpath)
@@ -217,7 +223,7 @@ class world_ui(QDialog, QWidget):
 
             if self.ui.chkRemovePict.isChecked():
                 os.remove(pictpath)
-            self.ui.txtLifeStatus.append( str(i) + "/" + now_generation + " is processed.")
+            self.ui.txtLifeStatus.append(str(i) + "/" + now_generation + " is processed.")
         video.release()
 
     # loopをstopする/labelのstatusをクリアする/status boxをクリアする
@@ -300,9 +306,10 @@ class world_ui(QDialog, QWidget):
             return os.path.join(sys._MEIPASS, relative_path)
         return os.path.join(os.path.abspath("."), relative_path)
 
+
 # 単体call時の動作
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = world_ui(20, 20)
     window.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())
