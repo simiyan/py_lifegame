@@ -4,10 +4,9 @@ import datetime
 import cv2
 import numpy as np
 from pathlib import Path
-from PySide6.QtWidgets import QApplication, QDialog, QWidget
-#  , QLineEdit, QLabel, QGraphicsView, QMessageBox
+from PySide6.QtWidgets import QApplication, QWidget
 
-sys.path.append(str(Path('__file__').resolve().parent.parent))
+sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from PySide6 import QtGui as gui, QtCore
 from CUI.life_controller import controller
@@ -16,7 +15,11 @@ from pictbox import Ui_Dialog
 from QLabel_Clickable import QLabel_Clickable
 
 
-class world_ui(QDialog, QWidget):
+BASE_DIR = Path(__file__).resolve().parent.parent
+RESOURCE_DIR = BASE_DIR / "resources"
+
+
+class world_ui(QWidget):
     # resource名を指定
     static_label_name = "imgLabel"
     static_generation = "世代"
@@ -29,8 +32,11 @@ class world_ui(QDialog, QWidget):
     # static_dead_pict = 'resources/batsu12_5.jpg'
     # static_pict_size = 12
 
-    static_alive_pict = 'resources/maru25.png'
-    static_dead_pict = 'resources/batsu25.png'
+    # static_alive_pict = 'resources/maru25.png'
+    # static_dead_pict = 'resources/batsu25.png'
+    static_alive_pict = 'maru25.png'
+    static_dead_pict = 'batsu25.png'
+
     static_pict_size = 25
 
     # static_alive_pict = 'resources/maru150.jpg'
@@ -137,7 +143,6 @@ class world_ui(QDialog, QWidget):
         imageLabel.setPixmap(gui.QPixmap.fromImage(image))
         # なんのためにobjectNameをsetするのか不明。access方法も不明
         imageLabel.setObjectName(objName)
-
         # ObjectNameにAccessできないので自作
         imageLabel.give_myname(objName)
 
@@ -304,7 +309,7 @@ class world_ui(QDialog, QWidget):
     def resource_path(self, relative_path):
         if hasattr(sys, '_MEIPASS'):
             return os.path.join(sys._MEIPASS, relative_path)
-        return os.path.join(os.path.abspath("."), relative_path)
+        return str(RESOURCE_DIR / relative_path)
 
 
 # 単体call時の動作
