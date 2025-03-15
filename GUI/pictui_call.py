@@ -4,6 +4,7 @@ import datetime
 import cv2
 import numpy as np
 from pathlib import Path
+from PySide6.QtWidgets import QApplication, QWidget, QSizePolicy
 from PySide6.QtWidgets import QApplication, QWidget
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
@@ -27,9 +28,7 @@ class WorldUI(QWidget):
     static_logdir_name = "my_life_diary"
     static_video_sizex = 500
     static_video_sizey = 635
-
     static_pict_size = 25
-
     static_alive_pict = RESOURCE_DIR / "maru25.png"
     static_dead_pict = RESOURCE_DIR / "batsu25.png"
 
@@ -62,17 +61,19 @@ class WorldUI(QWidget):
         self.capturedir = Path(self.static_logdir_name) / self.nowtime
         self.capturedir.mkdir(parents=True, exist_ok=True)
 
-        # # 初期化。動的に自作labelを生成する
-        # # その際、nameとlabelの組合せ辞書を受け取る
-        # self.dictLabel.update(self.initUI(self.worldx, self.worldy))
-        # self.size_of_world = (self.worldx, self.worldy)
+        # txtLifeStatus の圧縮を防ぐための設定を復活
+        self.ui.txtLifeStatus.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.ui.txtLifeStatus.setMinimumHeight(70)
 
     def adjust_window_size(self):
-        """ ウィンドウサイズを適切に調整 """
-        worldsizex = self.worldx * self.static_pict_size + 10 + self.static_buffer_ten
+        txtStatusHeight = 70
+        self.init_placex = 10
+        self.init_placey = 75 + txtStatusHeight
+
+        worldsizex = self.worldx * self.static_pict_size + self.init_placex + self.static_buffer_ten
         resizex = max(worldsizex, 340 + 80 + self.static_buffer_ten)
 
-        resizey = self.worldy * self.static_pict_size + 85 + self.static_buffer_ten
+        resizey = self.worldy * self.static_pict_size + self.init_placey + self.static_buffer_ten
         self.resize(resizex, resizey)
 
     def initUI(self):
@@ -130,22 +131,6 @@ class WorldUI(QWidget):
         result = {imageLabel.tell_myname(): imageLabel}
         return result
 
-    # labelの変更後status listを参照し、各labelのstatusを変更する
-    # 仮引数ではアドレスが変わってしまうため、インスタンス変数を直接編集し、returnはしない
-    # def labels_chg_status(self, status_list: list):
-    #     for s in range(len(status_list)):
-    #         for r in range(len(status_list[s])):
-    #             label_name = self.static_label_name + str(r) + "_" + str(s)
-    #             if status_list[s][r] == 0:
-    #                 img = gui.QImage(self.static_dead_pict_path)
-    #                 self.dictLabel[label_name].change_status(0)
-
-    #             elif status_list[s][r] == 1:
-    #                 img = gui.QImage(self.static_alive_pict_path)
-    #                 self.dictLabel[label_name].change_status(1)
-
-    #             self.dictLabel[label_name].setPixmap(gui.QPixmap.fromImage(img))
-
     def labels_chg_status(self, status_list: list):
         """ ラベルの状態を更新する """
         for y, row in enumerate(status_list):
@@ -153,18 +138,6 @@ class WorldUI(QWidget):
                 label_name = f"{self.static_label_name}{x}_{y}"
                 img_path = self.static_alive_pict if status == 1 else self.static_dead_pict
                 self.dictLabel[label_name].setPixmap(gui.QPixmap(str(img_path)))
-
-    # # 与えられたstatusによって、画像とstatusを反転させる
-    # def label_reverse_status(self, status, imglbl: QLabel_Clickable):
-    #     if status == 0:
-    #         img = gui.QImage(self.static_alive_pict_path)
-    #         imglbl.change_status(1)
-
-    #     elif status == 1:
-    #         img = gui.QImage(self.static_dead_pict_path)
-    #         imglbl.change_status(0)
-
-    #     imglbl.setPixmap(gui.QPixmap.fromImage(img))
 
     def label_reverse_status(self, status, imglbl: QLabel_Clickable):
         """ 与えられたstatusによって、画像とstatusを反転させる """
@@ -180,16 +153,6 @@ class WorldUI(QWidget):
 
         reason = (imglbl.tell_status(), "manual")
         self.txtStatusUpdate(imglbl.tell_myname(), reason)
-
-    # 初期値をlivesに与えるための、labelのstatusを集める。
-    # def collect_labels_status(self, init_world):
-    #     result1st = []
-    #     # lblのstatusをつめたリストを作成
-    #     for name in self.static_label_name_list:
-    #         result1st.append(self.dictLabel[name].tell_status())
-
-    #     result2nd = np.array(result1st).reshape(init_world[1], -1).tolist()
-    #     return result2nd
 
     def collect_labels_status(self, init_world):
         """ すべてのラベルの状態を取得し、リスト化する """
@@ -235,33 +198,6 @@ class WorldUI(QWidget):
             self.running = True
             self.timer.start()
 
-    # # make video from screenshot
-    # def save_video(self):
-    #     static_world_no = "world_no_"
-    #     world_no = self.ui.lblWorldNo.text()
-    #     video_name = static_world_no + world_no + ".mp4"
-
-    #     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    #     video = cv2.VideoWriter(self.capturedir + "/" + video_name, fourcc, 90.0, (self.static_video_sizex, self.static_video_sizey))
-
-    #     now_generation = self.ui.lblGeneration.text()[:-1]
-    #     now_generation = now_generation[:-1]
-
-    #     for i in range(1, int(now_generation) + 1):
-    #         QApplication.processEvents()
-    #         pictpath = self.capturedir + "/" + '{0:03d}.jpg'.format(i)
-    #         img = cv2.imread(pictpath)
-    #         img = cv2.resize(img, (self.static_video_sizex, self.static_video_sizey))
-
-    #         # 同じ画像を複数回表示することで1画像の表示時間を長くする
-    #         for double_times in range(1, 25):
-    #             video.write(img)
-
-    #         if self.ui.chkRemovePict.isChecked():
-    #             os.remove(pictpath)
-    #         self.ui.txtLifeStatus.append(str(i) + "/" + now_generation + " is processed.")
-    #     video.release()
-
     def save_video(self):
         """ キャプチャ画像を動画として保存 """
         video_name = self.capturedir / "output.mp4"
@@ -280,21 +216,6 @@ class WorldUI(QWidget):
 
         video.release()
 
-    # # loopをstopする/labelのstatusをクリアする/status boxをクリアする
-    # def btnReset_clicked(self):
-    #     # name listの名前を持つ各labelのstatusを0に変更する
-    #     for name in self.static_label_name_list:
-    #         self.dictLabel[name].change_status(0)
-
-    #     # labelのstatusリストを入手する
-    #     zero_label = self.collect_labels_status(self.size_of_world)
-
-    #     # 画像の変更をする
-    #     self.labels_chg_status(zero_label)
-
-    #     self.save_video()
-    #     self.ui.txtLifeStatus.setText("")
-    #     self.ui.lblGeneration.setText(self.static_generation)
     def btnReset_clicked(self):
         """ リセットボタン：ゲーム状態を初期化 """
         self.running = False
@@ -318,50 +239,6 @@ class WorldUI(QWidget):
         world_no = self.ui.lblWorldNo.text()
         int_world_no = int(world_no) + 1
         self.ui.lblWorldNo.setText(str(int_world_no))
-
-    # ボタンクリック時にlife_gameをstartする
-    # def btnStart_clicked(self, init_world):
-    #     int_generation = 0
-    #     self.flgContinue = True
-    #     self.updateWorldNo()
-
-    #     # lblのstatusをつめたリストを作成
-    #     label_status_list = self.collect_labels_status(init_world)
-    #     # worldを生成する
-    #     lw = controller(init_world[0], init_world[1])
-
-    #     # ------------life_game_start ------------ #
-    #     # labelから得たlivesの初期値を渡す #
-    #     lives = lw.summon_lives("manual", label_status_list)
-
-    #     # flgの監視 > life_game
-    #     while True:
-    #         QApplication.processEvents()
-    #         while self.flgContinue:
-    #             int_generation += 1
-    #             self.ui.lblGeneration.setText(str(int_generation) + self.static_generation)
-
-    #             # cui出力
-    #             # lw.checkLivesStatus(lives, int_generation)
-
-    #             # 各livesの周辺を調査し、次のstatusを教える
-    #             lives = lw.tell_around_status(lives)
-
-    #             # life_statusをlabel_statusに反映
-    #             label_status_list = lw.collect_lives_status(lives)
-
-    #             # labels_statusによりstatusと画像を更新する
-    #             self.labels_chg_status(label_status_list)
-
-    #             # lifeとGUIの更新
-    #             QApplication.processEvents()
-    #             lives = lw.go2next_generation(lives)
-
-    #             # タイムラグをおく
-    #             # time.sleep(1)
-    #             # 世代ごとに画像保存：3桁.jpg
-    #             capture_name = self.capturedir + "/" + str('{0:03d}.jpg'.format(int_generation))
-    #             self.grab().save(capture_name)
 
     def btnStart_clicked(self, init_world):
         if not self.running:
