@@ -28,46 +28,46 @@ class world_ui(QWidget):
     static_video_sizex = 500
     static_video_sizey = 635
 
-    # static_alive_pict = 'resources/maru12_5.jpg'
-    # static_dead_pict = 'resources/batsu12_5.jpg'
-    # static_pict_size = 12
-
-    # static_alive_pict = 'resources/maru25.png'
-    # static_dead_pict = 'resources/batsu25.png'
     static_alive_pict = 'maru25.png'
     static_dead_pict = 'batsu25.png'
 
     static_pict_size = 25
 
-    # static_alive_pict = 'resources/maru150.jpg'
-    # static_dead_pict = 'resources/batsu50.jpg'
-    # static_pict_size = 50
-
     # constractor:label, paramater, buttonの機能をdefine
     def __init__(self, worldx, worldy, parent=None):
         super(world_ui, self).__init__(parent)
-        nowtime = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+        self.nowtime = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+        self.worldx, self.worldy = worldx, worldy
 
         # resource_pathの定義：pict_path
-        self.static_alive_pict_path = self.resource_path(self.static_alive_pict)
-        self.static_dead_pict_path = self.resource_path(self.static_dead_pict)
+        # self.static_alive_pict_path = self.resource_path(self.static_alive_pict)
+        # self.static_dead_pict_path = self.resource_path(self.static_dead_pict)
 
-        # 世界の大きさはクラス変数で所持
-        self.value_maxx = worldx
-        self.value_maxy = worldy
+        # # 世界の大きさはクラス変数で所持
+        # self.value_maxx = worldx
+        # self.value_maxy = worldy
 
-        # labelへのアクセスキーと実態
-        self.static_label_name_list = []
-        self.dictLabel = {}
+        # # labelへのアクセスキーと実態
+        # self.static_label_name_list = []
+        # self.dictLabel = {}
 
-        # 初期のpict[0][0](label)の配置path位置
-        txtStatusHight = 70
-        self.init_placex = 10
-        self.init_placey = 75 + txtStatusHight
-        self.flgContinue = False
+        # # 初期のpict[0][0](label)の配置path位置
+        # txtStatusHight = 70
+        # self.init_placex = 10
+        # self.init_placey = 75 + txtStatusHight
+        # self.flgContinue = False
 
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
+        self.resize(worldx * 25 + 100, worldy * 25 + 100)
+
+        # ラベルの管理
+        self.dictLabel = self.initUI(worldx, worldy)
+
+        # QTimer のセットアップ
+        self.timer = QtCore.QTimer()
+        self.timer.timeout.connect(self.game_tick)
+        self.timer.setInterval(100)  # 100ミリ秒ごとに更新
 
         # world size * pict_size + (x, y 初期値) + 10(buffer) のサイズにdialogを変更する
         worldsizex = worldx * self.static_pict_size + self.init_placex + self.static_buffer_ten
@@ -77,8 +77,8 @@ class world_ui(QWidget):
 
         # 初期化。動的に自作labelを生成する
         # その際、nameとlabelの組合せ辞書を受け取る
-        self.dictLabel.update(self.initUI(self.value_maxx, self.value_maxy))
-        self.size_of_world = (self.value_maxx, self.value_maxy)
+        self.dictLabel.update(self.initUI(self.worldx, self.worldy))
+        self.size_of_world = (self.worldx, self.worldy)
 
         # btnWorldTick押下時に、worldサイズを渡す
         self.ui.btnWorldTick.clicked.connect(lambda: self.btnStart_clicked(self.size_of_world))
@@ -96,11 +96,17 @@ class world_ui(QWidget):
         # 選択中のitemの値を取得する
         # print(self.ui.cmbInitialData.itemText(self.ui.cmbInitialData.currentIndex()))
 
-        # *** for pict save directory/will change to function ***
-        if not os.path.exists(self.static_logdir_name):
-            os.mkdir(self.static_logdir_name)
+        # # *** for pict save directory/will change to function ***
+        # if not os.path.exists(self.static_logdir_name):
+        #     os.mkdir(self.static_logdir_name)
+        # フラグ管理
+        self.running = False
+        self.int_generation = 0
+        self.lw = None
+        self.lives = None
 
-        self.capturedir = self.static_logdir_name + "/" + nowtime
+        # 画像保存ディレクトリ作成
+        self.capturedir = os.path.join("my_life_diary", self.nowtime)
         os.mkdir(self.capturedir)
 
     def cmbChanged(self):
@@ -197,12 +203,44 @@ class world_ui(QWidget):
         result2nd = np.array(result1st).reshape(init_world[1], -1).tolist()
         return result2nd
 
-    def btnStopPause_clicked(self):
-        if self.flgContinue is True:
-            self.flgContinue = False
+    def game_tick(self):
+        """ 1ターンの処理（`while True` の代替）"""
+        if not self.running:
+            return
 
-        elif self.flgContinue is False:
-            self.flgContinue = True
+        self.int_generation += 1
+        self.ui.lblGeneration.setText(str(self.int_generation) + self.static_generation)
+
+        # 各livesの周辺を調査し、次のstatusを教える
+        self.lives = self.lw.tell_around_status(self.lives)
+
+        # life_statusをlabel_statusに反映
+        label_status_list = self.lw.collect_lives_status(self.lives)
+
+        # labels_statusによりstatusと画像を更新する
+        self.labels_chg_status(label_status_list)
+
+        # 次の世代へ
+        self.lives = self.lw.go2next_generation(self.lives)
+
+        # 世代ごとに画像保存
+        capture_name = os.path.join(self.capturedir, f"{self.int_generation:03d}.jpg")
+        self.grab().save(capture_name)
+
+    # def btnStopPause_clicked(self):
+    #     if self.flgContinue is True:
+    #         self.flgContinue = False
+
+    #     elif self.flgContinue is False:
+    #         self.flgContinue = True
+    def btnStopPause_clicked(self):
+        """ 停止・再開ボタン """
+        if self.running:
+            self.running = False
+            self.timer.stop()
+        else:
+            self.running = True
+            self.timer.start()
 
     # make video from screenshot
     def save_video(self):
@@ -231,21 +269,27 @@ class world_ui(QWidget):
             self.ui.txtLifeStatus.append(str(i) + "/" + now_generation + " is processed.")
         video.release()
 
-    # loopをstopする/labelのstatusをクリアする/status boxをクリアする
+    # # loopをstopする/labelのstatusをクリアする/status boxをクリアする
+    # def btnReset_clicked(self):
+    #     # name listの名前を持つ各labelのstatusを0に変更する
+    #     for name in self.static_label_name_list:
+    #         self.dictLabel[name].change_status(0)
+
+    #     # labelのstatusリストを入手する
+    #     zero_label = self.collect_labels_status(self.size_of_world)
+
+    #     # 画像の変更をする
+    #     self.labels_chg_status(zero_label)
+
+    #     self.save_video()
+    #     self.ui.txtLifeStatus.setText("")
+    #     self.ui.lblGeneration.setText(self.static_generation)
     def btnReset_clicked(self):
-        # name listの名前を持つ各labelのstatusを0に変更する
-        for name in self.static_label_name_list:
-            self.dictLabel[name].change_status(0)
-
-        # labelのstatusリストを入手する
-        zero_label = self.collect_labels_status(self.size_of_world)
-
-        # 画像の変更をする
-        self.labels_chg_status(zero_label)
-
-        self.save_video()
-        self.ui.txtLifeStatus.setText("")
-        self.ui.lblGeneration.setText(self.static_generation)
+        """ リセットボタン """
+        self.running = False
+        self.timer.stop()
+        self.int_generation = 0
+        self.clear_board()  # 盤面をクリアする関数（必要に応じて実装）
 
     # randomボタンクリック時randomに値をsetする
     def btnRandomSet_clicked(self):
@@ -262,54 +306,78 @@ class world_ui(QWidget):
         self.ui.lblWorldNo.setText(str(int_world_no))
 
     # ボタンクリック時にlife_gameをstartする
+    # def btnStart_clicked(self, init_world):
+    #     int_generation = 0
+    #     self.flgContinue = True
+    #     self.updateWorldNo()
+
+    #     # lblのstatusをつめたリストを作成
+    #     label_status_list = self.collect_labels_status(init_world)
+    #     # worldを生成する
+    #     lw = controller(init_world[0], init_world[1])
+
+    #     # ------------life_game_start ------------ #
+    #     # labelから得たlivesの初期値を渡す #
+    #     lives = lw.summon_lives("manual", label_status_list)
+
+    #     # flgの監視 > life_game
+    #     while True:
+    #         QApplication.processEvents()
+    #         while self.flgContinue:
+    #             int_generation += 1
+    #             self.ui.lblGeneration.setText(str(int_generation) + self.static_generation)
+
+    #             # cui出力
+    #             # lw.checkLivesStatus(lives, int_generation)
+
+    #             # 各livesの周辺を調査し、次のstatusを教える
+    #             lives = lw.tell_around_status(lives)
+
+    #             # life_statusをlabel_statusに反映
+    #             label_status_list = lw.collect_lives_status(lives)
+
+    #             # labels_statusによりstatusと画像を更新する
+    #             self.labels_chg_status(label_status_list)
+
+    #             # lifeとGUIの更新
+    #             QApplication.processEvents()
+    #             lives = lw.go2next_generation(lives)
+
+    #             # タイムラグをおく
+    #             # time.sleep(1)
+    #             # 世代ごとに画像保存：3桁.jpg
+    #             capture_name = self.capturedir + "/" + str('{0:03d}.jpg'.format(int_generation))
+    #             self.grab().save(capture_name)
+
     def btnStart_clicked(self, init_world):
-        int_generation = 0
-        self.flgContinue = True
-        self.updateWorldNo()
+        """ スタートボタンクリック時にライフゲーム開始 """
+        if not self.running:
+            self.running = True
+            self.int_generation = 0
+            self.updateWorldNo()
 
-        # lblのstatusをつめたリストを作成
-        label_status_list = self.collect_labels_status(init_world)
-        # worldを生成する
-        lw = controller(init_world[0], init_world[1])
+            # lblのstatusをつめたリストを作成
+            label_status_list = self.collect_labels_status(init_world)
 
-        # ------------life_game_start ------------ #
-        # labelから得たlivesの初期値を渡す #
-        lives = lw.summon_lives("manual", label_status_list)
+            # worldを生成する
+            self.lw = controller(init_world[0], init_world[1])
 
-        # flgの監視 > life_game
-        while True:
-            QApplication.processEvents()
-            while self.flgContinue:
-                int_generation += 1
-                self.ui.lblGeneration.setText(str(int_generation) + self.static_generation)
+            # labelから得たlivesの初期値を渡す
+            self.lives = self.lw.summon_lives("manual", label_status_list)
 
-                # cui出力
-                # lw.checkLivesStatus(lives, int_generation)
-
-                # 各livesの周辺を調査し、次のstatusを教える
-                lives = lw.tell_around_status(lives)
-
-                # life_statusをlabel_statusに反映
-                label_status_list = lw.collect_lives_status(lives)
-
-                # labels_statusによりstatusと画像を更新する
-                self.labels_chg_status(label_status_list)
-
-                # lifeとGUIの更新
-                QApplication.processEvents()
-                lives = lw.go2next_generation(lives)
-
-                # タイムラグをおく
-                # time.sleep(1)
-                # 世代ごとに画像保存：3桁.jpg
-                capture_name = self.capturedir + "/" + str('{0:03d}.jpg'.format(int_generation))
-                self.grab().save(capture_name)
+            self.timer.start()
 
     # convert to resource path, return:path of resource
     def resource_path(self, relative_path):
         if hasattr(sys, '_MEIPASS'):
             return os.path.join(sys._MEIPASS, relative_path)
         return str(RESOURCE_DIR / relative_path)
+
+    def clear_board(self):
+        """ 盤面をリセットし、すべてのセルを初期状態に戻す """
+        for label in self.dictLabel.values():
+            label.setPixmap(gui.QPixmap("resources/batsu25.png"))  # 死の状態の画像を設定
+        self.ui.lblGeneration.setText("0" + self.static_generation)  # 世代数をリセット
 
 
 # 単体call時の動作
