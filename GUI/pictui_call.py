@@ -19,7 +19,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 RESOURCE_DIR = BASE_DIR / "resources"
 
 
-class world_ui(QWidget):
+class WorldUI(QWidget):
     # resource名を指定
     static_label_name = "imgLabel"
     static_generation = "世代"
@@ -28,86 +28,75 @@ class world_ui(QWidget):
     static_video_sizex = 500
     static_video_sizey = 635
 
-    static_alive_pict = 'maru25.png'
-    static_dead_pict = 'batsu25.png'
-
     static_pict_size = 25
+
+    static_alive_pict = RESOURCE_DIR / "maru25.png"
+    static_dead_pict = RESOURCE_DIR / "batsu25.png"
 
     # constractor:label, paramater, buttonの機能をdefine
     def __init__(self, worldx, worldy, parent=None):
-        super(world_ui, self).__init__(parent)
+        super(WorldUI, self).__init__(parent)
         self.nowtime = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
         self.worldx, self.worldy = worldx, worldy
-
-        # resource_pathの定義：pict_path
-        # self.static_alive_pict_path = self.resource_path(self.static_alive_pict)
-        # self.static_dead_pict_path = self.resource_path(self.static_dead_pict)
-
-        # # 世界の大きさはクラス変数で所持
-        # self.value_maxx = worldx
-        # self.value_maxy = worldy
-
-        # # labelへのアクセスキーと実態
-        # self.static_label_name_list = []
-        # self.dictLabel = {}
-
-        # # 初期のpict[0][0](label)の配置path位置
-        # txtStatusHight = 70
-        # self.init_placex = 10
-        # self.init_placey = 75 + txtStatusHight
-        # self.flgContinue = False
+        # フラグ管理
+        self.running = False
+        self.int_generation = 0
+        self.lw = None
+        self.lives = None
+        self.dictLabel = {}
+        self.size_of_world = (self.worldx, self.worldy)
 
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
-        self.resize(worldx * 25 + 100, worldy * 25 + 100)
+        self.adjust_window_size()
 
-        # ラベルの管理
-        self.dictLabel = self.initUI(worldx, worldy)
+        self.initUI()
+        self.setupConnections()
 
         # QTimer のセットアップ
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.game_tick)
         self.timer.setInterval(100)  # 100ミリ秒ごとに更新
 
-        # world size * pict_size + (x, y 初期値) + 10(buffer) のサイズにdialogを変更する
-        worldsizex = worldx * self.static_pict_size + self.init_placex + self.static_buffer_ten
-        resizex = worldsizex if worldsizex > 340 + 80 + self.static_buffer_ten else 340 + 80 + self.static_buffer_ten
-        resizey = worldy * self.static_pict_size + self.init_placey + self.static_buffer_ten
+        # 画像保存ディレクトリ作成
+        self.capturedir = Path(self.static_logdir_name) / self.nowtime
+        self.capturedir.mkdir(parents=True, exist_ok=True)
+
+        # # 初期化。動的に自作labelを生成する
+        # # その際、nameとlabelの組合せ辞書を受け取る
+        # self.dictLabel.update(self.initUI(self.worldx, self.worldy))
+        # self.size_of_world = (self.worldx, self.worldy)
+
+    def adjust_window_size(self):
+        """ ウィンドウサイズを適切に調整 """
+        worldsizex = self.worldx * self.static_pict_size + 10 + self.static_buffer_ten
+        resizex = max(worldsizex, 340 + 80 + self.static_buffer_ten)
+
+        resizey = self.worldy * self.static_pict_size + 85 + self.static_buffer_ten
         self.resize(resizex, resizey)
 
-        # 初期化。動的に自作labelを生成する
-        # その際、nameとlabelの組合せ辞書を受け取る
-        self.dictLabel.update(self.initUI(self.worldx, self.worldy))
-        self.size_of_world = (self.worldx, self.worldy)
+    def initUI(self):
+        for y in range(self.worldy):
+            for x in range(self.worldx):
+                label_name = f"{self.static_label_name}{x}_{y}"
+                label = QLabel_Clickable(self)
+                label.setPixmap(gui.QPixmap(str(self.static_dead_pict)))
+                label.setGeometry(QtCore.QRect(x * self.static_pict_size + 10, y * self.static_pict_size + 85, self.static_pict_size, self.static_pict_size))
+                label.clicked.connect(lambda lbl=label: self.lbl_clicked(lbl))
+                self.dictLabel[label_name] = label
 
+    def setupConnections(self):
         # btnWorldTick押下時に、worldサイズを渡す
         self.ui.btnWorldTick.clicked.connect(lambda: self.btnStart_clicked(self.size_of_world))
         self.ui.btnRandomSet.clicked.connect(self.btnRandomSet_clicked)
         self.ui.btnReset.clicked.connect(self.btnReset_clicked)
         self.ui.btnStopPause.clicked.connect(self.btnStopPause_clicked)
         self.ui.cmbInitialData.currentIndexChanged.connect(self.cmbChanged)
-
-        self.ui.cmbInitialData.addItem("a")
-        self.ui.cmbInitialData.addItem("b")
-        # selectedindexを変える
+        self.ui.cmbInitialData.addItems(["a", "b"])
         self.ui.cmbInitialData.setCurrentIndex(1)
-        # selectedindexを取得する
-        #  print(self.ui.cmbInitialData.currentIndex())
-        # 選択中のitemの値を取得する
-        # print(self.ui.cmbInitialData.itemText(self.ui.cmbInitialData.currentIndex()))
 
-        # # *** for pict save directory/will change to function ***
-        # if not os.path.exists(self.static_logdir_name):
-        #     os.mkdir(self.static_logdir_name)
-        # フラグ管理
-        self.running = False
-        self.int_generation = 0
-        self.lw = None
-        self.lives = None
-
-        # 画像保存ディレクトリ作成
-        self.capturedir = os.path.join("my_life_diary", self.nowtime)
-        os.mkdir(self.capturedir)
+        print(self.ui.cmbInitialData.currentIndex())
+        print(self.ui.cmbInitialData.itemText(self.ui.cmbInitialData.currentIndex()))
 
     def cmbChanged(self):
         pass
@@ -124,22 +113,6 @@ class world_ui(QWidget):
             status = "生"
 
         self.ui.txtLifeStatus.append(name + "は" + reason[1] + "により" + status + "になった。")
-
-    # 初期化：labelを規定数配置し、その情報を返却
-    def initUI(self, worldx, worldy):
-        result = {}
-        for y in range(worldy):
-            self.init_placex = 10
-            for x in range(worldx):
-                labelName = self.static_label_name + str(x) + "_" + str(y)
-
-                # labelをworldの回数定義し、nameとobjectを辞書で返却
-                result.update(self.mkLabel(self.init_placex, self.init_placey, labelName))
-
-                self.static_label_name_list.append(labelName)
-                self.init_placex += self.static_pict_size
-            self.init_placey += self.static_pict_size
-        return result
 
     # (x, y)に objNameの名前をつけたimgLabelを置く(1個)。key, value:objName, Labelの組合せを返す
     def mkLabel(self, x, y, objName):
@@ -159,31 +132,46 @@ class world_ui(QWidget):
 
     # labelの変更後status listを参照し、各labelのstatusを変更する
     # 仮引数ではアドレスが変わってしまうため、インスタンス変数を直接編集し、returnはしない
+    # def labels_chg_status(self, status_list: list):
+    #     for s in range(len(status_list)):
+    #         for r in range(len(status_list[s])):
+    #             label_name = self.static_label_name + str(r) + "_" + str(s)
+    #             if status_list[s][r] == 0:
+    #                 img = gui.QImage(self.static_dead_pict_path)
+    #                 self.dictLabel[label_name].change_status(0)
+
+    #             elif status_list[s][r] == 1:
+    #                 img = gui.QImage(self.static_alive_pict_path)
+    #                 self.dictLabel[label_name].change_status(1)
+
+    #             self.dictLabel[label_name].setPixmap(gui.QPixmap.fromImage(img))
+
     def labels_chg_status(self, status_list: list):
-        for s in range(len(status_list)):
-            for r in range(len(status_list[s])):
-                label_name = self.static_label_name + str(r) + "_" + str(s)
-                if status_list[s][r] == 0:
-                    img = gui.QImage(self.static_dead_pict_path)
-                    self.dictLabel[label_name].change_status(0)
+        """ ラベルの状態を更新する """
+        for y, row in enumerate(status_list):
+            for x, status in enumerate(row):
+                label_name = f"{self.static_label_name}{x}_{y}"
+                img_path = self.static_alive_pict if status == 1 else self.static_dead_pict
+                self.dictLabel[label_name].setPixmap(gui.QPixmap(str(img_path)))
 
-                elif status_list[s][r] == 1:
-                    img = gui.QImage(self.static_alive_pict_path)
-                    self.dictLabel[label_name].change_status(1)
+    # # 与えられたstatusによって、画像とstatusを反転させる
+    # def label_reverse_status(self, status, imglbl: QLabel_Clickable):
+    #     if status == 0:
+    #         img = gui.QImage(self.static_alive_pict_path)
+    #         imglbl.change_status(1)
 
-                self.dictLabel[label_name].setPixmap(gui.QPixmap.fromImage(img))
+    #     elif status == 1:
+    #         img = gui.QImage(self.static_dead_pict_path)
+    #         imglbl.change_status(0)
 
-    # 与えられたstatusによって、画像とstatusを反転させる
+    #     imglbl.setPixmap(gui.QPixmap.fromImage(img))
+
     def label_reverse_status(self, status, imglbl: QLabel_Clickable):
-        if status == 0:
-            img = gui.QImage(self.static_alive_pict_path)
-            imglbl.change_status(1)
-
-        elif status == 1:
-            img = gui.QImage(self.static_dead_pict_path)
-            imglbl.change_status(0)
-
-        imglbl.setPixmap(gui.QPixmap.fromImage(img))
+        """ 与えられたstatusによって、画像とstatusを反転させる """
+        new_status = 1 if status == 0 else 0
+        img_path = self.static_alive_pict if new_status == 1 else self.static_dead_pict
+        imglbl.change_status(new_status)
+        imglbl.setPixmap(gui.QPixmap(str(img_path)))
 
     # ラベルクリック時にstatusによって画像を変更する
     def lbl_clicked(self, imglbl: QLabel_Clickable):
@@ -194,14 +182,25 @@ class world_ui(QWidget):
         self.txtStatusUpdate(imglbl.tell_myname(), reason)
 
     # 初期値をlivesに与えるための、labelのstatusを集める。
-    def collect_labels_status(self, init_world):
-        result1st = []
-        # lblのstatusをつめたリストを作成
-        for name in self.static_label_name_list:
-            result1st.append(self.dictLabel[name].tell_status())
+    # def collect_labels_status(self, init_world):
+    #     result1st = []
+    #     # lblのstatusをつめたリストを作成
+    #     for name in self.static_label_name_list:
+    #         result1st.append(self.dictLabel[name].tell_status())
 
-        result2nd = np.array(result1st).reshape(init_world[1], -1).tolist()
-        return result2nd
+    #     result2nd = np.array(result1st).reshape(init_world[1], -1).tolist()
+    #     return result2nd
+
+    def collect_labels_status(self, init_world):
+        """ すべてのラベルの状態を取得し、リスト化する """
+        status_list = []
+        for y in range(init_world[1]):
+            row = []
+            for x in range(init_world[0]):
+                label_name = f"{self.static_label_name}{x}_{y}"
+                row.append(self.dictLabel[label_name].tell_status())
+            status_list.append(row)
+        return status_list
 
     def game_tick(self):
         """ 1ターンの処理（`while True` の代替）"""
@@ -227,12 +226,6 @@ class world_ui(QWidget):
         capture_name = os.path.join(self.capturedir, f"{self.int_generation:03d}.jpg")
         self.grab().save(capture_name)
 
-    # def btnStopPause_clicked(self):
-    #     if self.flgContinue is True:
-    #         self.flgContinue = False
-
-    #     elif self.flgContinue is False:
-    #         self.flgContinue = True
     def btnStopPause_clicked(self):
         """ 停止・再開ボタン """
         if self.running:
@@ -242,31 +235,49 @@ class world_ui(QWidget):
             self.running = True
             self.timer.start()
 
-    # make video from screenshot
+    # # make video from screenshot
+    # def save_video(self):
+    #     static_world_no = "world_no_"
+    #     world_no = self.ui.lblWorldNo.text()
+    #     video_name = static_world_no + world_no + ".mp4"
+
+    #     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    #     video = cv2.VideoWriter(self.capturedir + "/" + video_name, fourcc, 90.0, (self.static_video_sizex, self.static_video_sizey))
+
+    #     now_generation = self.ui.lblGeneration.text()[:-1]
+    #     now_generation = now_generation[:-1]
+
+    #     for i in range(1, int(now_generation) + 1):
+    #         QApplication.processEvents()
+    #         pictpath = self.capturedir + "/" + '{0:03d}.jpg'.format(i)
+    #         img = cv2.imread(pictpath)
+    #         img = cv2.resize(img, (self.static_video_sizex, self.static_video_sizey))
+
+    #         # 同じ画像を複数回表示することで1画像の表示時間を長くする
+    #         for double_times in range(1, 25):
+    #             video.write(img)
+
+    #         if self.ui.chkRemovePict.isChecked():
+    #             os.remove(pictpath)
+    #         self.ui.txtLifeStatus.append(str(i) + "/" + now_generation + " is processed.")
+    #     video.release()
+
     def save_video(self):
-        static_world_no = "world_no_"
-        world_no = self.ui.lblWorldNo.text()
-        video_name = static_world_no + world_no + ".mp4"
+        """ キャプチャ画像を動画として保存 """
+        video_name = self.capturedir / "output.mp4"
+        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+        video = cv2.VideoWriter(str(video_name), fourcc, 30.0, (self.static_video_sizex, self.static_video_sizey))
 
-        fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
-        video = cv2.VideoWriter(self.capturedir + "/" + video_name, fourcc, 90.0, (self.static_video_sizex, self.static_video_sizey))
-
-        now_generation = self.ui.lblGeneration.text()[:-1]
-        now_generation = now_generation[:-1]
-
-        for i in range(1, int(now_generation) + 1):
-            QApplication.processEvents()
-            pictpath = self.capturedir + "/" + '{0:03d}.jpg'.format(i)
-            img = cv2.imread(pictpath)
+        images = sorted(self.capturedir.glob("*.jpg"))
+        for img_path in images:
+            img = cv2.imread(str(img_path))
+            if img is None:
+                continue
             img = cv2.resize(img, (self.static_video_sizex, self.static_video_sizey))
-
-            # 同じ画像を複数回表示することで1画像の表示時間を長くする
-            for double_times in range(1, 25):
-                video.write(img)
-
+            video.write(img)
             if self.ui.chkRemovePict.isChecked():
-                os.remove(pictpath)
-            self.ui.txtLifeStatus.append(str(i) + "/" + now_generation + " is processed.")
+                img_path.unlink()
+
         video.release()
 
     # # loopをstopする/labelのstatusをクリアする/status boxをクリアする
@@ -285,17 +296,20 @@ class world_ui(QWidget):
     #     self.ui.txtLifeStatus.setText("")
     #     self.ui.lblGeneration.setText(self.static_generation)
     def btnReset_clicked(self):
-        """ リセットボタン """
+        """ リセットボタン：ゲーム状態を初期化 """
         self.running = False
         self.timer.stop()
         self.int_generation = 0
-        self.clear_board()  # 盤面をクリアする関数（必要に応じて実装）
+        self.clear_board()
+        self.ui.txtLifeStatus.setText("")  # テキストボックスをクリア
+        self.save_video()  # 世代ごとの画像保存
 
     # randomボタンクリック時randomに値をsetする
     def btnRandomSet_clicked(self):
-        # statusをrandomにsetさせる
-        for name in self.static_label_name_list:
+        """ 全てのセルの状態をランダムに変更 """
+        for name in self.dictLabel:  # self.static_label_name_list ではなく self.dictLabel を使う
             self.dictLabel[name].change_status_random()
+
         random_label = self.collect_labels_status(self.size_of_world)
         self.labels_chg_status(random_label)
 
@@ -350,27 +364,31 @@ class world_ui(QWidget):
     #             self.grab().save(capture_name)
 
     def btnStart_clicked(self, init_world):
-        """ スタートボタンクリック時にライフゲーム開始 """
         if not self.running:
             self.running = True
             self.int_generation = 0
             self.updateWorldNo()
 
-            # lblのstatusをつめたリストを作成
+            # 盤面の初期状態を取得
             label_status_list = self.collect_labels_status(init_world)
 
-            # worldを生成する
+            # コントローラーを生成し、ライフゲームを開始
             self.lw = controller(init_world[0], init_world[1])
-
-            # labelから得たlivesの初期値を渡す
             self.lives = self.lw.summon_lives("manual", label_status_list)
 
+            # **初期盤面を UI に反映**
+            self.labels_chg_status(label_status_list)
+
+            # **最初のゲームステップを強制実行**
+            self.game_tick()
+
+            # **タイマーを開始**
             self.timer.start()
 
     # convert to resource path, return:path of resource
     def resource_path(self, relative_path):
         if hasattr(sys, '_MEIPASS'):
-            return os.path.join(sys._MEIPASS, relative_path)
+            return str(Path(sys._MEIPASS) / relative_path)
         return str(RESOURCE_DIR / relative_path)
 
     def clear_board(self):
@@ -383,6 +401,6 @@ class world_ui(QWidget):
 # 単体call時の動作
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    window = world_ui(20, 20)
+    window = WorldUI(20, 20)
     window.show()
     sys.exit(app.exec())
