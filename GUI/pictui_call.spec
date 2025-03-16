@@ -4,7 +4,7 @@ block_cipher = None
 
 
 a = Analysis(['pictui_call.py'],
-             pathex=['C:\\work\\VSANA\\src\\life_game\\GUI_HumanLike'],
+             pathex=['.'],
              binaries=[],
              datas=[],
              hiddenimports=[],
@@ -37,8 +37,8 @@ a = Analysis(['pictui_call.py'],
              win_private_assemblies=False,
              cipher=block_cipher,
              noarchive=False)
-a.datas += [('resources/maru25.png', '.\\resources/maru25.png', 'DATA')]
-a.datas += [('resources/batsu25.png', '.\\resources/batsu25.png', 'DATA')]
+a.datas += [('../resources/maru25.png', '.\\resources/maru25.png', 'DATA')]
+a.datas += [('../resources/batsu25.png', '.\\resources/batsu25.png', 'DATA')]
 pyz = PYZ(a.pure, a.zipped_data,
              cipher=block_cipher)
 exe = EXE(pyz,
