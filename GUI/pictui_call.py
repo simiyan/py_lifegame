@@ -2,7 +2,6 @@ import sys
 import os
 import datetime
 import cv2
-import numpy as np
 from pathlib import Path
 from PySide6.QtWidgets import QApplication, QWidget
 
@@ -194,21 +193,62 @@ class WorldUI(QWidget):
             self.timer.start()
 
     def save_video(self):
-        """ キャプチャ画像を動画として保存 """
-        video_name = self.capturedir / "output.mp4"
+        """ キャプチャ画像を動画として保存（進行状況をGUIに表示） """
+        static_world_no = "world_no_"
+        world_no = self.ui.lblWorldNo.text()
+        video_name = f"{static_world_no}{world_no}.mp4"
+        video_path = str(self.capturedir / video_name)  # Pathオブジェクトをstrに変換
+
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-        video = cv2.VideoWriter(str(video_name), fourcc, 30.0, (self.static_video_sizex, self.static_video_sizey))
+        video = cv2.VideoWriter(video_path, fourcc, 90.0, (self.static_video_sizex, self.static_video_sizey))
 
         images = sorted(self.capturedir.glob("*.jpg"))
-        for img_path in images:
+        now_generation = len(images)  # 画像の総数から世代数を取得
+
+        for i, img_path in enumerate(images, start=1):
+            QApplication.processEvents()
             img = cv2.imread(str(img_path))
             if img is None:
                 continue
             img = cv2.resize(img, (self.static_video_sizex, self.static_video_sizey))
-            video.write(img)
+
+            # 各フレームを複数回書き込んでフレームレートを調整
+            for _ in range(25):
+                video.write(img)
+
+            # 進捗をGUIに表示
+            self.ui.txtLifeStatus.append(f"{i}/{now_generation} is processed.")
+
             if self.ui.chkRemovePict.isChecked():
                 img_path.unlink()
+        video.release()
+        self.ui.txtLifeStatus.clear()
 
+    # make video from screenshot
+    def save_video_old(self):
+        static_world_no = "world_no_"
+        world_no = self.ui.lblWorldNo.text()
+        video_name = static_world_no + world_no + ".mp4"
+
+        fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
+        video = cv2.VideoWriter(self.capturedir + "/" + video_name, fourcc, 90.0, (self.static_video_sizex, self.static_video_sizey))
+
+        now_generation = self.ui.lblGeneration.text()[:-1]
+        now_generation = now_generation[:-1]
+
+        for i in range(1, int(now_generation) + 1):
+            QApplication.processEvents()
+            pictpath = self.capturedir + "/" + '{0:03d}.jpg'.format(i)
+            img = cv2.imread(pictpath)
+            img = cv2.resize(img, (self.static_video_sizex, self.static_video_sizey))
+
+            # 同じ画像を複数回表示することで1画像の表示時間を長くする
+            for double_times in range(1, 25):
+                video.write(img)
+
+            if self.ui.chkRemovePict.isChecked():
+                os.remove(pictpath)
+            self.ui.txtLifeStatus.append(str(i) + "/" + now_generation + " is processed.")
         video.release()
 
     def btnReset_clicked(self):
