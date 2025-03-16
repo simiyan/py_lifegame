@@ -4,7 +4,6 @@ import datetime
 import cv2
 import numpy as np
 from pathlib import Path
-from PySide6.QtWidgets import QApplication, QWidget, QSizePolicy
 from PySide6.QtWidgets import QApplication, QWidget
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
@@ -61,10 +60,6 @@ class WorldUI(QWidget):
         self.capturedir = Path(self.static_logdir_name) / self.nowtime
         self.capturedir.mkdir(parents=True, exist_ok=True)
 
-        # txtLifeStatus の圧縮を防ぐための設定を復活
-        self.ui.txtLifeStatus.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.ui.txtLifeStatus.setMinimumHeight(70)
-
     def adjust_window_size(self):
         txtStatusHeight = 70
         self.init_placex = 10
@@ -82,7 +77,7 @@ class WorldUI(QWidget):
                 label_name = f"{self.static_label_name}{x}_{y}"
                 label = QLabel_Clickable(self)
                 label.setPixmap(gui.QPixmap(str(self.static_dead_pict)))
-                label.setGeometry(QtCore.QRect(x * self.static_pict_size + 10, y * self.static_pict_size + 85, self.static_pict_size, self.static_pict_size))
+                label.setGeometry(QtCore.QRect(x * self.static_pict_size + 10, y * self.static_pict_size + 85 + 50, self.static_pict_size, self.static_pict_size))
                 label.clicked.connect(lambda lbl=label: self.lbl_clicked(lbl))
                 self.dictLabel[label_name] = label
 
@@ -271,7 +266,7 @@ class WorldUI(QWidget):
     def clear_board(self):
         """ 盤面をリセットし、すべてのセルを初期状態に戻す """
         for label in self.dictLabel.values():
-            label.setPixmap(gui.QPixmap("resources/batsu25.png"))  # 死の状態の画像を設定
+            label.setPixmap(gui.QPixmap(self.static_dead_pict))  # 死の状態の画像を設定
         self.ui.lblGeneration.setText("0" + self.static_generation)  # 世代数をリセット
 
 
